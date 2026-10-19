@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
@@ -16,6 +17,12 @@ class User(db.Model):
 
     # relationship to user's notes
     notes = db.relationship('Note', backref='user', cascade='all, delete-orphan', lazy=True)
+
+    @validates('username')
+    def validate_username(self, key, username):
+        if not username or len(username.strip()) < 3:
+            raise ValueError("Username must be at least 3 characters long")
+        return username.strip()
 
     @hybrid_property
     def password_hash(self):
@@ -53,6 +60,18 @@ class Note(db.Model):
 
     # foreign key linking to the owner user
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    @validates('title')
+    def validate_title(self, key, title):
+        if not title or len(title.strip()) == 0:
+            raise ValueError("Title is required")
+        return title.strip()
+
+    @validates('content')
+    def validate_content(self, key, content):
+        if not content or len(content.strip()) == 0:
+            raise ValueError("Content is required")
+        return content.strip()
 
     def to_dict(self):
         return {

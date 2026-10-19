@@ -59,6 +59,8 @@ class Signup(Resource):
             # Log user in upon registration
             session['user_id'] = new_user.id
             return new_user.to_dict(), 201
+        except ValueError as ve:
+            return {'error': str(ve)}, 400
         except Exception as e:
             db.session.rollback()
             return {'error': 'Could not create user'}, 500
@@ -156,6 +158,8 @@ class NotesResource(Resource):
             db.session.add(new_note)
             db.session.commit()
             return new_note.to_dict(), 201
+        except ValueError as ve:
+            return {'error': str(ve)}, 400
         except Exception as e:
             db.session.rollback()
             return {'error': 'Failed to create note'}, 500
@@ -203,6 +207,9 @@ class NoteById(Resource):
         try:
             db.session.commit()
             return note.to_dict(), 200
+        except ValueError as ve:
+            db.session.rollback()
+            return {'error': str(ve)}, 400
         except Exception as e:
             db.session.rollback()
             return {'error': 'Failed to update note'}, 500
