@@ -1,12 +1,15 @@
+import os
+# Use an isolated SQLite test database so development data is untouched
+os.environ['DATABASE_URI'] = 'sqlite:///test.db'
+
 import pytest
 from app import app
 from models import db, User, Note
 
 @pytest.fixture
 def client():
-    # Configure app for testing with an in-memory SQLite database
+    # Configure app for testing
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     app.config['SECRET_KEY'] = 'test-secret-key'
 
     with app.test_client() as client:

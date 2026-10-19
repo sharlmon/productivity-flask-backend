@@ -6,6 +6,9 @@ fake = Faker()
 
 def seed_database():
     with app.app_context():
+        # Ensure database tables are created
+        db.create_all()
+
         print("🌱 Clearing database tables...")
         Note.query.delete()
         User.query.delete()
